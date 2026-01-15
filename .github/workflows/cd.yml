@@ -1,0 +1,21 @@
+name: Django CD
+on:
+  push:
+    branches: [main]
+jobs:
+  deploy:
+    runs-on: self-hosted  # Uses your Windows Server runner
+    steps:
+    - uses: actions/checkout@v4
+    - name: Activate Virtualenv and Pull Updates
+      run: |
+        cd C:\inetpub\wwwroot\my_django_project
+        git pull origin main
+        venv\Scripts\activate.bat
+        pip install -r requirements.txt
+    - name: Run Migrations and Collect Static
+      run: |
+        python manage.py migrate
+        python manage.py collectstatic --noinput
+    - name: Restart IIS Site
+      run: iisreset /restart  # Or use PowerShell: Restart-WebAppPool "MyAppPool"
