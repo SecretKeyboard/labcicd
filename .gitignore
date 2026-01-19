@@ -1,0 +1,5 @@
+env
+.env
+logs
+staticfiles
+db.sqlite3
