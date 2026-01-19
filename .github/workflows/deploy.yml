@@ -1,0 +1,30 @@
+name: Django CI/CD
+
+on:
+  push:
+    branches: [ "main" ] # Triggers on push to main
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Sync Files
+      run: |
+        # Use robocopy to sync files to the IIS directory (excluding venv and git)
+        robocopy "." "C:\inetpub\wwwroot\labcicd" /MIR /XD .git env logs /XF web.config
+
+    - name: Update Dependencies
+      run: |
+        cd C:\inetpub\wwwroot\labcicd
+        .\env\Scripts\python.exe -m pip install -r requirements.txt
+        .\env\Scripts\python.exe manage.py migrate
+        .\env\Scripts\python.exe manage.py collectstatic --noinput
+
+    - name: Restart IIS
+      run: |
+        # This triggers IIS to pick up changes in Django
+        iisreset /restart

@@ -1,5 +1,6 @@
-env
+/env/
 .env
-logs
-staticfiles
+/logs/
+/staticfiles/
 db.sqlite3
+/actions-runner/
